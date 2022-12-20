@@ -14,6 +14,8 @@ export interface ToReactNativeOptions extends BaseTranspilerOptions {
   stateType?: 'useState' | 'mobx' | 'valtio' | 'solid' | 'builder';
 }
 
+const textEquivalentHtmlTags = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span']);
+
 const stylePropertiesThatMustBeNumber = new Set(['lineHeight']);
 
 const MEDIA_QUERY_KEY_REGEX = /^@media.*/;
@@ -78,13 +80,25 @@ const PROCESS_REACT_NATIVE_PLUGIN: Plugin = () => ({
     pre: (json: MitosisComponent) => {
       traverse(json).forEach((node) => {
         if (isMitosisNode(node)) {
-          // TODO: handle TextInput, Image, etc
-          if (node.name.toLowerCase() === node.name) {
-            node.name = 'View';
+
+          if (textEquivalentHtmlTags.has(node.name.toLowerCase())) {
+            node.name = 'Text';
           }
 
-          if (node.properties._text?.trim().length || node.bindings._text?.code?.trim()?.length) {
-            node.name = 'Text';
+          if (node.name.toLowerCase() === 'img') {
+            node.name = 'Image';
+          }
+
+          if (node.name.toLowerCase() === 'input') {
+            node.name = 'TextInput';
+          }
+
+          if (node.name.toLowerCase() === 'button') {
+            node.name = 'Button';
+          }
+
+          if (node.name.toLowerCase() === node.name) {
+            node.name = 'View';
           }
 
           if (node.properties.class) {

@@ -212,14 +212,14 @@ export const blockToReact = (
 
   if (json.properties._text) {
     const text = json.properties._text;
-    if (options.type === 'native' && text.trim().length) {
+    if (options.type === 'native' && text.trim().length && json.name !== 'View') {
       return `<Text>${text}</Text>`;
     }
     return text;
   }
   if (json.bindings._text?.code) {
     const processed = processBinding(json.bindings._text.code as string, options);
-    if (options.type === 'native') {
+    if (options.type === 'native' && json.name !== 'View') {
       return `<Text>{${processed}}</Text>`;
     }
     return `{${processed}}`;
@@ -589,7 +589,7 @@ const _componentToReact = (
       ? "import * as React from 'react';"
       : `
   import * as React from 'react';
-  import { View, StyleSheet, Image, Text } from 'react-native';
+  import { View, Image, Text, Button, TextInput } from 'react-native';
   `
   }
   ${styledComponentsCode ? `import styled from 'styled-components';\n` : ''}
